@@ -30,7 +30,7 @@ def contour(W, n=3, **kwargs):
     plt.contour(-W, n, **kwargs)
 
 
-def plot(mdl, cmap='seismic', axis=0):
+def plot(mdl, cmap='seismic', axis=0, show=True):
     """
     Plots the parameters of a NeuralEncodingModel
 
@@ -69,5 +69,10 @@ def plot(mdl, cmap='seismic', axis=0):
     for j in range(nsub):
         f = mdl.theta['f'][j]
         ax = fig.add_subplot(2, nsub, j + nsub + 1)
-        mdl.tents.plot(f)
+        mdl.tents.plot(f, ax=ax, show=show)
         ax.set_xlim(-4, 4)
+
+    if show:
+        plt.show()
+
+    return fig

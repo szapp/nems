@@ -57,7 +57,8 @@ class Nonlinearity:
         Phi = self(x)[0]
         return np.linalg.lstsq(Phi, y, rcond=-1)[0]
 
-    def plot(self, weights, ax=None, num_samples=1000, color='black'):
+    def plot(self, weights, ax=None, num_samples=1000, color='black',
+             show=True):
         """
         Plot the nonlinearity
         """
@@ -73,8 +74,9 @@ class Nonlinearity:
 
         ax.set_xlim(self.tent_span)
 
-        plt.show()
-        plt.draw()
+        if show:
+            plt.show()
+            plt.draw()
 
         return ax
 
