@@ -590,8 +590,9 @@ class LNLN(NeuralEncodingModel):
         num_alt : int, optional
             The number of times to alternate between optimizing nonlinearities and optimizing filters. Default: 2
 
-        max_iter : int, optional
-            The maximum number of steps to take during each leg of the alternating minimization. Default: 25
+        max_iter : int or tuple, optional
+            The maximum number of steps to take during each leg of the alternating minimization.
+            If tuple, then separate for optimizing 'f' (first element) and 'W' (second element). Default: 25
 
         num_likelihood_steps : int, optional
             The number of steps to take when optimizing the data likelihood term (using SFO)
@@ -635,7 +636,8 @@ class LNLN(NeuralEncodingModel):
 
         # runs the optimization procedure for one set of parameters (a single
         # leg of the alternating minimization)
-        def optimize_param(f_df_wrapper, param_key, check_grad, cur_iter):
+        def optimize_param(f_df_wrapper, param_key, check_grad, cur_iter,
+                           max_iter=max_iter):
 
             # initialize the SFO instance
             loglikelihood_optimizer = SFO(
@@ -677,37 +679,58 @@ class LNLN(NeuralEncodingModel):
             # and optimizing filters
             for alt_iter in range(num_alt):
 
-                # Fit filters
-                print('\n')
-                tp.banner('Fitting filters')
+                # Check maximum number of iterations
+                cur_max_iter = (max_iter if not isinstance(max_iter, tuple)
+                                else max_iter[0])
 
-                # wrapper for the objective and gradient
-                def f_df_wrapper(W, d):
-                    return self.f_df(W, theta_current['f'], d, param_gradient='W')
+                if cur_max_iter > 0:
 
-                # run the optimization procedure for this parameter
-                Wk = optimize_param(f_df_wrapper, 'W', check_grad, alt_iter + 0.5).copy()
+                    # Fit filters
+                    print('\n')
+                    tp.banner('Fitting filters')
 
-                # normalize filters
-                for filter_index in range(Wk.shape[0]):
-                    theta_current['W'][filter_index] = utilities.nrm(Wk[filter_index])
+                    # wrapper for the objective and gradient
+                    def f_df_wrapper(W, d):
+                        return self.f_df(W, theta_current['f'], d,
+                                         param_gradient='W')
 
-                # print and save test results
-                update_results()
+                    # run the optimization procedure for this parameter
+                    Wk = optimize_param(f_df_wrapper, 'W', check_grad,
+                                        alt_iter + 0.5,
+                                        max_iter=cur_max_iter).copy()
 
-                # Fit nonlinearity
-                print('\n')
-                tp.banner('Fitting nonlinearity')
+                    # normalize filters
+                    for filter_index in range(Wk.shape[0]):
+                        theta_current['W'][filter_index] = utilities.nrm(
+                            Wk[filter_index])
 
-                # wrapper for the objective and gradient
-                def f_df_wrapper(f, d):
-                    return self.f_df(theta_current['W'], f, d, param_gradient='f')
+                    # print and save test results
+                    update_results()
 
-                # run the optimization procedure for this parameter
-                theta_current['f'] = optimize_param(f_df_wrapper, 'f', check_grad, alt_iter + 1).copy()
+                # Check maximum number of iterations
+                cur_max_iter = (max_iter if not isinstance(max_iter, tuple)
+                                else max_iter[1])
 
-                # print and save test results
-                update_results()
+                if cur_max_iter > 0:
+
+                    # Fit nonlinearity
+                    print('\n')
+                    tp.banner('Fitting nonlinearity')
+
+                    # wrapper for the objective and gradient
+                    def f_df_wrapper(f, d):
+                        return self.f_df(theta_current['W'], f, d,
+                                         param_gradient='f')
+
+                    # run the optimization procedure for this parameter
+                    theta_current['f'] = optimize_param(f_df_wrapper, 'f',
+                                                        check_grad,
+                                                        alt_iter + 1,
+                                                        max_iter=cur_max_iter
+                                                        ).copy()
+
+                    # print and save test results
+                    update_results()
 
         except KeyboardInterrupt:
             print('\nCleaning up... ')
