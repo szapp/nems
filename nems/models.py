@@ -271,9 +271,9 @@ class NeuralEncodingModel(object):
         visualization.plot(self, axis=axis)
 
     def kfold(self, nfolds, *args, **kwargs):
-        kf = KFold(len(self.data), n_folds=nfolds, shuffle=True)
+        kf = KFold(n_splits=nfolds, shuffle=True)
         results = list()
-        for train_indices, test_indices in kf:
+        for train_indices, test_indices in kf.split(self.data):
             self.indices['train'] = train_indices
             self.indices['test'] = test_indices
             self.fit(*args, **kwargs)
