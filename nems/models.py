@@ -679,7 +679,7 @@ class LNLN(NeuralEncodingModel):
 
                 # Display the number of the current batch of alternations
                 print('\n')
-                tp.banner(f'Alternation {alt_iter+1}/{num_alt}')
+                tp.banner('Alternation {0}/{1}'.format(alt_iter+1, num_alt))
 
                 # Fit filters
                 print('\n')
