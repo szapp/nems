@@ -324,7 +324,8 @@ class NeuralEncodingModel(object):
                 jar['train'].attrs[lbl] = res['train'][ix]
                 jar['test'].attrs[lbl] = res['test'][ix]
 
-            jar['thetas'] = self.thetas
+            jar['evo_W'] = np.stack(self.thetas['W'])
+            jar['evo_f'] = np.stack(self.thetas['f'])
 
 
 class LNLN(NeuralEncodingModel):
@@ -633,7 +634,7 @@ class LNLN(NeuralEncodingModel):
         self.convergence = defaultdict(list)
 
         # store theta during optimization
-        self.thetas = []
+        self.thetas = defaultdict(list)
 
         def update_results():
             if disp > 0:
@@ -641,7 +642,8 @@ class LNLN(NeuralEncodingModel):
                 for k in ('train', 'test'):
                     self.convergence[k].append(tmp_results[k])
             if keep_theta:
-                self.thetas.append(copy.deepcopy(theta_current))
+                for k in ('W', 'f'):
+                    self.thetas[k].append(theta_current[k])
 
         # runs the optimization procedure for one set of parameters (a single
         # leg of the alternating minimization)
