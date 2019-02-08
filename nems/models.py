@@ -324,6 +324,8 @@ class NeuralEncodingModel(object):
                 jar['train'].attrs[lbl] = res['train'][ix]
                 jar['test'].attrs[lbl] = res['test'][ix]
 
+            jar['thetas'] = self.thetas
+
 
 class LNLN(NeuralEncodingModel):
     def __init__(self, stim, spkcounts, filter_dims, minibatch_size=None,
