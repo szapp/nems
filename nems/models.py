@@ -581,7 +581,7 @@ class LNLN(NeuralEncodingModel):
 
         return f_df_wrapper
 
-    def fit(self, num_alt=2, max_iter=20, num_likelihood_steps=50, disp=2, check_grad=None, callback=None):
+    def fit(self, num_alt=2, max_iter=20, num_likelihood_steps=50, disp=2, check_grad=None, callback=None, keep_theta=False):
         """
         Runs an optimization algorithm to learn the parameters of the model given training data and regularizers
 
@@ -606,6 +606,9 @@ class LNLN(NeuralEncodingModel):
         callback : function
             A callback function that gets called each iteration with the current parameters and a dictionary of other information
 
+        keep_theta : bool, optional
+            Indicate whether to record the parameters throughout the iterations.
+
         Notes
         -----
         See the `proxalgs` module for more information on the optimization algorithm
@@ -627,11 +630,16 @@ class LNLN(NeuralEncodingModel):
         # store train/test results during optimization
         self.convergence = defaultdict(list)
 
+        # store theta during optimization
+        self.thetas = []
+
         def update_results():
             if disp > 0:
                 tmp_results = self.print_test_results(theta_current)
                 for k in ('train', 'test'):
                     self.convergence[k].append(tmp_results[k])
+            if keep_theta:
+                self.thetas.append(copy.deepcopy(theta_current))
 
         # runs the optimization procedure for one set of parameters (a single
         # leg of the alternating minimization)
