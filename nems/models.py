@@ -645,7 +645,7 @@ class LNLN(NeuralEncodingModel):
                     self.convergence[k].append(tmp_results[k])
             if keep_theta:
                 for k in ('W', 'f'):
-                    self.thetas[k].append(theta_current[k])
+                    self.thetas[k].append(theta_current[k].copy())
 
         # runs the optimization procedure for one set of parameters (a single
         # leg of the alternating minimization)
