@@ -313,8 +313,13 @@ class NeuralEncodingModel(object):
         res = self.test(self.theta)
 
         with h5py.File(fullpath) as jar:
-            jar['W'] = self.theta['W']
-            jar['f'] = self.theta['f']
+            if self.thetas:
+                jar['W'] = np.stack(self.thetas['W'])
+                jar['f'] = np.stack(self.thetas['f'])
+            else:
+                jar['W'] = self.theta['W']
+                jar['f'] = self.theta['f']
+
             jar['Phi'] = self.tents(np.linspace(-5, 5, 1000))[0]
 
             jar['train'] = np.stack(self.convergence['train'])
@@ -323,9 +328,6 @@ class NeuralEncodingModel(object):
             for ix, lbl in enumerate(res['labels']):
                 jar['train'].attrs[lbl] = res['train'][ix]
                 jar['test'].attrs[lbl] = res['test'][ix]
-
-            jar['evo_W'] = np.stack(self.thetas['W'])
-            jar['evo_f'] = np.stack(self.thetas['f'])
 
 
 class LNLN(NeuralEncodingModel):
