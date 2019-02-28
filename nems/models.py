@@ -333,7 +333,7 @@ class LNLN(NeuralEncodingModel):
     def __init__(self, stim, spkcounts, filter_dims, minibatch_size=None,
                  frac_train=0.8, num_subunits=1, num_tents=20, sigmasq=0.3,
                  final_nonlinearity='softrect', num_temporal_bases=None,
-                 **kwargs):
+                 random_seed=None, **kwargs):
         """
         Initializes a two layer cascade linear-nonlinear (LNLN) model
 
@@ -388,6 +388,9 @@ class LNLN(NeuralEncodingModel):
         final_nonlinearity : string
             a function from the `nonlinearities` module
 
+        random_seed : int, optional
+            supply the random seed
+
         Other Parameters
         ----------------
         spikes : array_like
@@ -402,7 +405,8 @@ class LNLN(NeuralEncodingModel):
         if num_temporal_bases is None:
             NeuralEncodingModel.__init__(self, 'lnln', stim, spkcounts,
                                          filter_dims, minibatch_size,
-                                         frac_train=frac_train)
+                                         frac_train=frac_train,
+                                         random_seed=random_seed)
         else:
             assert num_temporal_bases < filter_dims[
                 -1], "Number of temporal basis functions must be less than the number of temporal dimensions"
@@ -422,7 +426,8 @@ class LNLN(NeuralEncodingModel):
             NeuralEncodingModel.__init__(self, 'lnln', stim, spkcounts,
                                          filter_dims, minibatch_size,
                                          frac_train=frac_train,
-                                         temporal_basis=self.temporal_basis)
+                                         temporal_basis=self.temporal_basis,
+                                         random_seed=random_seed)
 
         # default # of subunits
         self.num_subunits = kwargs['W'].shape[
