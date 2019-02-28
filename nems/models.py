@@ -49,7 +49,8 @@ __all__ = ['NeuralEncodingModel', 'LNLN']
 
 class NeuralEncodingModel(object):
     def __init__(self, modeltype, stimulus, spkcounts, filter_dims,
-                 minibatch_size, frac_train=0.8, temporal_basis=None):
+                 minibatch_size, frac_train=0.8, temporal_basis=None,
+                 random_seed=None):
         """
         Neural enoding model super class
 
@@ -125,7 +126,10 @@ class NeuralEncodingModel(object):
                 })
 
         # set and store random seed (for reproducibility)
-        self.random_seed = np.random.randint(10000)
+        if random_seed is not None:
+            self.random_seed = random_seed
+        else:
+            self.random_seed = np.random.randint(10000)
         print("Setting random seed to: %i" % self.random_seed)
         np.random.seed(self.random_seed)
 
