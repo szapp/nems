@@ -20,21 +20,21 @@ def exp(x):
     return y, dydx, dy2dx2
 
 
-def softrect(x):
+def softrect(x, a1=1, a2=1, a3=0):
     """ Soft rectifying function
 
     .. math::
-        y = \log(1+e^x)
+        y = a1\log(1+e^(a2*(x+a3)))
     """
 
     # compute the soft rectifying nonlinearity
-    x_exp = np.exp(x)
-    y = np.log1p(x_exp)
+    x_exp = np.exp(a2*(x+a3))
+    y = a1 * np.log1p(x_exp)
 
     # compute the derivative
-    dydx = x_exp / (1 + x_exp)
+    dydx = (a1 * a2 * x_exp) / (1 + x_exp)
 
     # compute the second derivative
-    dy2dx2 = x_exp / (1 + x_exp)**2
+    dy2dx2 = (a1 * a2**2 * x_exp) / ((1 + x_exp)**2)
 
     return y, dydx, dy2dx2
